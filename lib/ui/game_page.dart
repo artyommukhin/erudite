@@ -41,16 +41,13 @@ class _GamePageState extends State<GamePage> {
             body: ListView(
               padding: EdgeInsets.symmetric(vertical: 24),
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Очков для победы: ${game.winScore}'),
-                    ],
+                if (game.winScore != null) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text('Очков для победы: ${game.winScore}'),
                   ),
-                ),
-                SizedBox(height: 16),
+                  SizedBox(height: 16),
+                ],
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: PlayerTable(game: game),
