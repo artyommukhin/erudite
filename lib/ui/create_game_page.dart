@@ -70,11 +70,26 @@ class _CreateGamePageState extends State<CreateGamePage> {
             ),
             SizedBox(height: 16),
             if (players.isNotEmpty) ...[
-              Text('Добавленные игроки:'),
-              SizedBox(height: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: players.map<Widget>((e) => Text(e.name)).toList(),
+              ReorderableListView(
+                shrinkWrap: true,
+                header: Text('Добавленные игроки:'),
+                onReorder: (oldIndex, newIndex) {
+                  setState(() {
+                    final player = players.removeAt(oldIndex);
+                    players.insert(newIndex, player);
+                  });
+                },
+                children: players.indexed.map<Widget>((e) {
+                  final (index, player) = e;
+                  return ListTile(
+                    key: ValueKey(player),
+                    title: Text(player.name),
+                    trailing: ReorderableDragStartListener(
+                      index: index,
+                      child: const Icon(Icons.drag_handle),
+                    ),
+                  );
+                }).toList(),
               ),
               SizedBox(height: 16),
             ],
