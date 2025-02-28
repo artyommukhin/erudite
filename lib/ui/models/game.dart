@@ -54,8 +54,7 @@ class Game extends ChangeNotifier {
     moveNumber--;
     decreaseCurrentPlayerIndex();
     words.removeLast();
-    final lastWord = currentPlayer.words.removeLast();
-    currentPlayer.score -= lastWord.computeScore();
+    currentPlayer.removeLastWord();
     notifyListeners();
   }
 

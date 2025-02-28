@@ -16,6 +16,11 @@ class Player {
     _words.add(word);
   }
 
+  void removeLastWord() {
+    final lastWord = _words.removeLast();
+    score -= lastWord.computeScore();
+  }
+
   @override
   String toString() {
     return name;
