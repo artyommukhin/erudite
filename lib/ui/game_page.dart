@@ -26,6 +26,19 @@ class _GamePageState extends State<GamePage> {
 
   Word? currentWord;
 
+  void _submitWord(Game game) {
+    try {
+      game.move(currentWord!);
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(e.toString())));
+      return;
+    }
+
+    setState(() => inputController.clear());
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -71,10 +84,7 @@ class _GamePageState extends State<GamePage> {
                           FilledButton(
                             onPressed: currentWord == null
                                 ? null
-                                : () => setState(() {
-                                      game.move(currentWord!);
-                                      inputController.clear();
-                                    }),
+                                : () => _submitWord(game),
                             child: Text('Ввести слово'),
                           ),
                         ],

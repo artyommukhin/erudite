@@ -19,6 +19,9 @@ class Game extends ChangeNotifier {
   int get roundNumber => (moveNumber / players.length).ceil();
 
   void move(Word word) {
+    if (isWordAlreadyInGame(word)) {
+      throw Exception('Такое слово уже есть');
+    }
     currentPlayer.addWord(word);
     words.add(word);
     if (isWinScoreReached()) {
@@ -28,6 +31,10 @@ class Game extends ChangeNotifier {
     increaseCurrentPlayerIndex();
     moveNumber++;
     notifyListeners();
+  }
+
+  bool isWordAlreadyInGame(Word word) {
+    return words.any((w) => w.hasEqualLetters(word));
   }
 
   bool isWinScoreReached() {

@@ -34,4 +34,8 @@ class Word {
   String toString() {
     return letters.map((e) => e.value.symbol).join();
   }
+
+  bool hasEqualLetters(Word other) {
+    return toString() == other.toString();
+  }
 }
