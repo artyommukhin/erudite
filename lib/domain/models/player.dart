@@ -7,17 +7,19 @@ class Player {
 
   final String name;
   int score = 0;
-  final List<Word> _words = [];
+  final List<Word?> _words = [];
 
-  List<Word> get words => _words;
+  List<Word?> get words => _words;
 
-  void addWord(Word word) {
-    score += word.computeScore();
+  void addWord(Word? word) {
     _words.add(word);
+    if (word == null) return;
+    score += word.computeScore();
   }
 
   void removeLastWord() {
     final lastWord = _words.removeLast();
+    if (lastWord == null) return;
     score -= lastWord.computeScore();
   }
 

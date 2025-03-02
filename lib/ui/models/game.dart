@@ -1,3 +1,4 @@
+import 'package:erudite_app/domain/models/move.dart';
 import 'package:erudite_app/domain/models/player.dart';
 import 'package:erudite_app/domain/models/word.dart';
 import 'package:flutter/foundation.dart';
@@ -9,7 +10,7 @@ class Game extends ChangeNotifier {
   final int? winScore;
   int _currentPlayerIndex = 0;
   int moveNumber = 1;
-  List<Word> words = [];
+  List<Move> moves = [];
   bool isFinished = false;
 
   Player get currentPlayer {
@@ -23,7 +24,7 @@ class Game extends ChangeNotifier {
       throw Exception('Такое слово уже есть');
     }
     currentPlayer.addWord(word);
-    words.add(word);
+    moves.add(Move(word: word));
     if (isWinScoreReached()) {
       finish();
       return;
@@ -33,8 +34,19 @@ class Game extends ChangeNotifier {
     notifyListeners();
   }
 
+  void skipMove() {
+    currentPlayer.addWord(null);
+    moves.add(Move(word: null));
+    increaseCurrentPlayerIndex();
+    moveNumber++;
+    notifyListeners();
+  }
+
   bool isWordAlreadyInGame(Word word) {
-    return words.any((w) => w.hasEqualLetters(word));
+    return moves
+        .map((m) => m.word)
+        .nonNulls
+        .any((w) => w.hasEqualLetters(word));
   }
 
   bool isWinScoreReached() {
@@ -53,7 +65,7 @@ class Game extends ChangeNotifier {
     if (moveNumber == 1) throw Exception('There is no moves to revert');
     moveNumber--;
     decreaseCurrentPlayerIndex();
-    words.removeLast();
+    moves.removeLast();
     currentPlayer.removeLastWord();
     notifyListeners();
   }

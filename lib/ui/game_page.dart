@@ -93,6 +93,18 @@ class _GamePageState extends State<GamePage> {
                       Row(
                         children: [
                           FilledButton(
+                            onPressed: () {
+                              game.skipMove();
+                              setState(() => inputController.clear());
+                            },
+                            child: Text('Пропустить ход'),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      Row(
+                        children: [
+                          FilledButton(
                             onPressed: game.moveNumber == 1
                                 ? null
                                 : () => setState(() {

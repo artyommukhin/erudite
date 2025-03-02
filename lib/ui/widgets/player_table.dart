@@ -1,4 +1,4 @@
-import 'package:erudite_app/domain/models/word.dart';
+import 'package:erudite_app/domain/models/move.dart';
 import 'package:erudite_app/ui/models/game.dart';
 import 'package:flutter/material.dart';
 
@@ -9,11 +9,21 @@ class PlayerTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<(int, List<Word?>)> gameRounds = [];
-    for (var r = 1; r <= game.roundNumber; r++) {
-      final words =
-          game.players.map((e) => e.words.elementAtOrNull(r - 1)).toList();
-      gameRounds.add((r, words));
+    final List<(int, List<Move?>)> gameRounds = [];
+    for (var roundIndex = 0; roundIndex < game.roundNumber; roundIndex++) {
+      final playerCount = game.players.length;
+      final roundFirstMoveIndex = playerCount * roundIndex;
+      final nextRoundFirstMoveIndex = playerCount * (roundIndex + 1);
+
+      final List<Move?> moves = [];
+      if (game.moves.length < nextRoundFirstMoveIndex) {
+        moves.addAll(game.moves.sublist(roundFirstMoveIndex));
+        moves.addAll(List.filled(playerCount - moves.length, null));
+      } else {
+        moves.addAll(
+            game.moves.sublist(roundFirstMoveIndex, nextRoundFirstMoveIndex));
+      }
+      gameRounds.add((roundIndex + 1, moves));
     }
 
     return Table(
@@ -31,8 +41,12 @@ class PlayerTable extends StatelessWidget {
         for (final r in gameRounds)
           TableRow(children: [
             Text(r.$1.toString()),
-            for (final w in r.$2)
-              w == null ? SizedBox.shrink() : Text('$w: ${w.computeScore()}')
+            for (final move in r.$2)
+              move == null
+                  ? SizedBox.shrink()
+                  : move.word == null
+                      ? Text('---')
+                      : Text('${move.word}: ${move.word!.computeScore()}')
           ]),
       ],
     );
