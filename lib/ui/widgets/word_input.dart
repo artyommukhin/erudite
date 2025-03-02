@@ -12,12 +12,10 @@ class WordInput extends StatefulWidget {
     this.controller,
     required this.onUpdate,
     required this.horizontalPadding,
-    // required this.onSubmit,
   });
 
   final TextEditingController? controller;
-  final ValueChanged<Word?> onUpdate;
-  // final ValueSetter<Word> onSubmit;
+  final ValueChanged<(Word?, bool)> onUpdate;
 
   final double horizontalPadding;
 
@@ -29,6 +27,7 @@ class _WordInputState extends State<WordInput> {
   late TextEditingController _controller;
   String? _text;
   Word? _word;
+  bool allLettersUsed = false;
 
   @override
   void initState() {
@@ -47,7 +46,7 @@ class _WordInputState extends State<WordInput> {
   void _onInputUpdate(String input) {
     final word = input.isEmpty ? null : Word(_mapInputToLetters(input));
     setState(() => _word = word);
-    widget.onUpdate(word);
+    widget.onUpdate((word, allLettersUsed));
   }
 
   List<LetterDto> _mapInputToLetters(String input) {
@@ -75,7 +74,7 @@ class _WordInputState extends State<WordInput> {
         value: current.value,
         multiplier: newMultiplier,
       );
-      widget.onUpdate(_word!);
+      widget.onUpdate((_word!, allLettersUsed));
     });
   }
 
@@ -99,13 +98,24 @@ class _WordInputState extends State<WordInput> {
             ),
           ),
         ),
-        SizedBox(height: 16),
-        if (_word != null)
+        if (_word != null) ...[
+          SizedBox(height: 8),
+          CheckboxListTile(
+            controlAffinity: ListTileControlAffinity.leading,
+            value: allLettersUsed,
+            onChanged: (value) {
+              setState(() => allLettersUsed = value ?? false);
+              widget.onUpdate((_word!, allLettersUsed));
+            },
+            title: Text('Использованы все буквы с руки'),
+          ),
+          SizedBox(height: 8),
           WordView(
             word: _word!,
             onLetterTap: _onLetterTap,
             horizontalPadding: widget.horizontalPadding,
           ),
+        ],
       ],
     );
   }

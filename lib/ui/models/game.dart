@@ -19,12 +19,13 @@ class Game extends ChangeNotifier {
 
   int get roundNumber => (moveNumber / players.length).ceil();
 
-  void move(Word word) {
+  void move(Word word, bool usedAllLetters) {
     if (isWordAlreadyInGame(word)) {
       throw Exception('Такое слово уже есть');
     }
-    currentPlayer.addWord(word);
-    moves.add(Move(word: word));
+    final move = Move(word: word, usedAllLetters: usedAllLetters);
+    currentPlayer.addMove(move);
+    moves.add(move);
     if (isWinScoreReached()) {
       finish();
       return;
@@ -35,8 +36,8 @@ class Game extends ChangeNotifier {
   }
 
   void skipMove() {
-    currentPlayer.addWord(null);
-    moves.add(Move(word: null));
+    currentPlayer.addMove(Move.empty);
+    moves.add(Move.empty);
     increaseCurrentPlayerIndex();
     moveNumber++;
     notifyListeners();
@@ -66,7 +67,7 @@ class Game extends ChangeNotifier {
     moveNumber--;
     decreaseCurrentPlayerIndex();
     moves.removeLast();
-    currentPlayer.removeLastWord();
+    currentPlayer.removeLastMove();
     notifyListeners();
   }
 

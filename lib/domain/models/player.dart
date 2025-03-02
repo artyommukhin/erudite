@@ -1,4 +1,4 @@
-import 'package:erudite_app/domain/models/word.dart';
+import 'package:erudite_app/domain/models/move.dart';
 
 class Player {
   Player({
@@ -7,20 +7,28 @@ class Player {
 
   final String name;
   int score = 0;
-  final List<Word?> _words = [];
+  final List<Move> _moves = [];
 
-  List<Word?> get words => _words;
+  List<Move> get moves => _moves;
 
-  void addWord(Word? word) {
-    _words.add(word);
-    if (word == null) return;
-    score += word.computeScore();
+  void addMove(Move move) {
+    _moves.add(move);
+    if (move.word != null) {
+      score += move.word!.computeScore();
+    }
+    if (move.usedAllLetters) {
+      score += 15;
+    }
   }
 
-  void removeLastWord() {
-    final lastWord = _words.removeLast();
-    if (lastWord == null) return;
-    score -= lastWord.computeScore();
+  void removeLastMove() {
+    final lastMove = _moves.removeLast();
+    if (lastMove.word != null) {
+      score -= lastMove.word!.computeScore();
+    }
+    if (lastMove.usedAllLetters) {
+      score -= 15;
+    }
   }
 
   @override

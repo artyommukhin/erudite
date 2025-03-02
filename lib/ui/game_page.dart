@@ -25,10 +25,11 @@ class _GamePageState extends State<GamePage> {
   final inputController = TextEditingController();
 
   Word? currentWord;
+  bool allLettersUsed = false;
 
   void _submitWord(Game game) {
     try {
-      game.move(currentWord!);
+      game.move(currentWord!, allLettersUsed);
     } catch (e) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -70,7 +71,9 @@ class _GamePageState extends State<GamePage> {
                   controller: inputController,
                   onUpdate: (value) {
                     setState(() {
-                      currentWord = value;
+                      final (word, allLettersUsed) = value;
+                      currentWord = word;
+                      this.allLettersUsed = allLettersUsed;
                     });
                   },
                 ),
