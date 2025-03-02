@@ -1,5 +1,5 @@
-import 'package:erudite_app/domain/models/word.dart';
-import 'package:erudite_app/ui/widgets/word_input.dart';
+import 'package:erudite_app/word_calculator/domain/models/word.dart';
+import 'package:erudite_app/word_calculator/ui/widgets/word_input.dart';
 import 'package:flutter/material.dart';
 
 class WordCalculator extends StatefulWidget {

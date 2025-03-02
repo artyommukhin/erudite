@@ -1,6 +1,6 @@
-import 'package:erudite_app/domain/models/move.dart';
-import 'package:erudite_app/domain/models/player.dart';
-import 'package:erudite_app/domain/models/word.dart';
+import 'package:erudite_app/game/domain/models/move.dart';
+import 'package:erudite_app/game/domain/models/player.dart';
+import 'package:erudite_app/word_calculator/domain/models/word.dart';
 import 'package:flutter/foundation.dart';
 
 class Game extends ChangeNotifier {

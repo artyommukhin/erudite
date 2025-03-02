@@ -1,9 +1,9 @@
-import 'package:erudite_app/ui/game_results_page.dart';
-import 'package:erudite_app/ui/models/game.dart';
-import 'package:erudite_app/domain/models/player.dart';
-import 'package:erudite_app/domain/models/word.dart';
-import 'package:erudite_app/ui/widgets/player_table.dart';
-import 'package:erudite_app/ui/widgets/word_calculator.dart';
+import 'package:erudite_app/game/ui/game_results_page.dart';
+import 'package:erudite_app/game/ui/models/game.dart';
+import 'package:erudite_app/game/domain/models/player.dart';
+import 'package:erudite_app/word_calculator/domain/models/word.dart';
+import 'package:erudite_app/game/ui/widgets/player_table.dart';
+import 'package:erudite_app/word_calculator/ui/widgets/word_calculator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

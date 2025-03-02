@@ -1,5 +1,5 @@
-import 'package:erudite_app/domain/models/player.dart';
-import 'package:erudite_app/ui/game_page.dart';
+import 'package:erudite_app/game/domain/models/player.dart';
+import 'package:erudite_app/game/ui/game_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

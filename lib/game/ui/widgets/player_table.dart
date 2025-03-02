@@ -1,5 +1,5 @@
-import 'package:erudite_app/domain/models/move.dart';
-import 'package:erudite_app/ui/models/game.dart';
+import 'package:erudite_app/game/domain/models/move.dart';
+import 'package:erudite_app/game/ui/models/game.dart';
 import 'package:flutter/material.dart';
 
 class PlayerTable extends StatelessWidget {

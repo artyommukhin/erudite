@@ -1,4 +1,4 @@
-import 'package:erudite_app/ui/widgets/word_calculator.dart';
+import 'package:erudite_app/word_calculator/ui/widgets/word_calculator.dart';
 import 'package:flutter/material.dart';
 
 class CalculatorPage extends StatelessWidget {

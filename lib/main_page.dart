@@ -1,5 +1,5 @@
-import 'package:erudite_app/ui/create_game_page.dart';
-import 'package:erudite_app/ui/calculator_page.dart';
+import 'package:erudite_app/game/ui/create_game_page.dart';
+import 'package:erudite_app/word_calculator/ui/calculator_page.dart';
 import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {

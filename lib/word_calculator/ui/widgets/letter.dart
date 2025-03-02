@@ -1,4 +1,4 @@
-import 'package:erudite_app/domain/models/multiplier.dart';
+import 'package:erudite_app/word_calculator/domain/models/multiplier.dart';
 import 'package:flutter/material.dart';
 
 class Letter extends StatelessWidget {

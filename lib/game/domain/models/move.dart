@@ -1,4 +1,4 @@
-import 'package:erudite_app/domain/models/word.dart';
+import 'package:erudite_app/word_calculator/domain/models/word.dart';
 
 class Move {
   const Move({
