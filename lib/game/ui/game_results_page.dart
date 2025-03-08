@@ -12,7 +12,10 @@ class GameResultsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final winner = (game.players..sort((a, b) => b.score - a.score)).first;
+    final sortedPlayers = game.players.toList()
+      ..sort((a, b) => b.score.compareTo(a.score));
+
+    final winner = sortedPlayers.first;
 
     return Scaffold(
       appBar: AppBar(
@@ -23,7 +26,7 @@ class GameResultsPage extends StatelessWidget {
         children: [
           Center(child: Text('Победитель: $winner')),
           Text('Другие игроки:'),
-          for (final p in game.players) Text('${p.name}: ${p.score}'),
+          for (final p in sortedPlayers) Text('${p.name}: ${p.score}'),
           PlayerTable(game: game),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(),
