@@ -44,9 +44,11 @@ class PlayerTable extends StatelessWidget {
             for (final move in r.$2)
               move == null
                   ? SizedBox.shrink()
-                  : move.word == null
+                  : move.words.isEmpty
                       ? Text('---')
-                      : Text('${move.word}: ${move.word!.computeScore()}')
+                      : Text(
+                          '${move.words.join(" ")}: ${move.words.map((w) => w.computeScore()).join(" + ")}',
+                        )
           ]),
       ],
     );

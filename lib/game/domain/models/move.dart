@@ -2,12 +2,12 @@ import 'package:erudite_app/word_calculator/domain/models/word.dart';
 
 class Move {
   const Move({
-    required this.word,
+    required this.words,
     required this.usedAllLetters,
   });
 
-  static const empty = Move(word: null, usedAllLetters: false);
+  static const empty = Move(words: [], usedAllLetters: false);
 
-  final Word? word;
+  final List<Word> words;
   final bool usedAllLetters;
 }

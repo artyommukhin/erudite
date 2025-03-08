@@ -25,12 +25,12 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> {
   final inputController = TextEditingController();
 
-  Word? currentWord;
+  List<Word> words = [];
   bool allLettersUsed = false;
 
   void _submitWord(Game game) {
     try {
-      game.move(currentWord!, allLettersUsed);
+      game.move(words, allLettersUsed);
     } catch (e) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -81,8 +81,8 @@ class _GamePageState extends State<GamePage> {
                     controller: inputController,
                     onUpdate: (value) {
                       setState(() {
-                        final (word, allLettersUsed) = value;
-                        currentWord = word;
+                        final (words, allLettersUsed) = value;
+                        this.words = words;
                         this.allLettersUsed = allLettersUsed;
                       });
                     },
@@ -95,7 +95,7 @@ class _GamePageState extends State<GamePage> {
                         Row(
                           children: [
                             FilledButton(
-                              onPressed: currentWord == null
+                              onPressed: words.isEmpty
                                   ? null
                                   : () => _submitWord(game),
                               child: Text('Ввести слово'),

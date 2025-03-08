@@ -13,8 +13,8 @@ class Player {
 
   void addMove(Move move) {
     _moves.add(move);
-    if (move.word != null) {
-      score += move.word!.computeScore();
+    for (final word in move.words) {
+      score += word.computeScore();
     }
     if (move.usedAllLetters) {
       score += 15;
@@ -23,8 +23,8 @@ class Player {
 
   void removeLastMove() {
     final lastMove = _moves.removeLast();
-    if (lastMove.word != null) {
-      score -= lastMove.word!.computeScore();
+    for (final word in lastMove.words) {
+      score -= word.computeScore();
     }
     if (lastMove.usedAllLetters) {
       score -= 15;

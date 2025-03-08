@@ -5,6 +5,7 @@ import 'package:erudite_app/word_calculator/domain/models/multiplier.dart';
 import 'package:erudite_app/word_calculator/ui/widgets/word_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:separate/separate.dart';
 
 class WordInput extends StatefulWidget {
   const WordInput({
@@ -15,7 +16,7 @@ class WordInput extends StatefulWidget {
   });
 
   final TextEditingController? controller;
-  final ValueChanged<(Word?, bool)> onUpdate;
+  final ValueChanged<(List<Word>, bool)> onUpdate;
 
   final double horizontalPadding;
 
@@ -26,7 +27,7 @@ class WordInput extends StatefulWidget {
 class _WordInputState extends State<WordInput> {
   late TextEditingController _controller;
   String? _text;
-  Word? _word;
+  List<Word> _words = [];
   bool allLettersUsed = false;
 
   @override
@@ -44,9 +45,24 @@ class _WordInputState extends State<WordInput> {
   }
 
   void _onInputUpdate(String input) {
-    final word = input.isEmpty ? null : Word(_mapInputToLetters(input));
-    setState(() => _word = word);
-    widget.onUpdate((word, allLettersUsed));
+    final filteredInput = input.trim();
+    if (filteredInput.isEmpty) {
+      setState(() => _words = []);
+      widget.onUpdate((_words, allLettersUsed));
+      return;
+    }
+
+    final words = filteredInput
+        .trim()
+        .split(' ')
+        .where((element) => element.isNotEmpty)
+        .map((e) {
+      final letters = _mapInputToLetters(e);
+      return Word(letters);
+    }).toList();
+
+    setState(() => _words = words);
+    widget.onUpdate((words, allLettersUsed));
   }
 
   List<LetterDto> _mapInputToLetters(String input) {
@@ -65,16 +81,19 @@ class _WordInputState extends State<WordInput> {
     return letters;
   }
 
-  void _onLetterTap(int i) {
+  void _onWordLetterTap(int wordIndex, int letterIndex) {
     setState(() {
-      final current = _word!.letters[i];
-      final newMultiplier = Multiplier
-          .values[(current.multiplier.index + 1) % Multiplier.values.length];
-      _word!.letters[i] = LetterDto(
-        value: current.value,
+      final currentWord = _words[wordIndex];
+      final currentLetter = currentWord.letters[letterIndex];
+
+      final newMultiplier = Multiplier.values[
+          (currentLetter.multiplier.index + 1) % Multiplier.values.length];
+      currentWord.letters[letterIndex] = LetterDto(
+        value: currentLetter.value,
         multiplier: newMultiplier,
       );
-      widget.onUpdate((_word!, allLettersUsed));
+      _words[wordIndex] = currentWord;
+      widget.onUpdate((_words, allLettersUsed));
     });
   }
 
@@ -87,7 +106,7 @@ class _WordInputState extends State<WordInput> {
           child: TextField(
             controller: _controller,
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[ЁёА-я]')),
+              FilteringTextInputFormatter.allow(RegExp(r'[ЁёА-я ]')),
             ],
             decoration: InputDecoration(
               border: OutlineInputBorder(),
@@ -98,23 +117,26 @@ class _WordInputState extends State<WordInput> {
             ),
           ),
         ),
-        if (_word != null) ...[
+        if (_words.isNotEmpty) ...[
           SizedBox(height: 8),
           CheckboxListTile(
             controlAffinity: ListTileControlAffinity.leading,
             value: allLettersUsed,
             onChanged: (value) {
               setState(() => allLettersUsed = value ?? false);
-              widget.onUpdate((_word!, allLettersUsed));
+              widget.onUpdate((_words, allLettersUsed));
             },
             title: Text('Использованы все буквы с руки'),
           ),
           SizedBox(height: 8),
-          WordView(
-            word: _word!,
-            onLetterTap: _onLetterTap,
-            horizontalPadding: widget.horizontalPadding,
-          ),
+          ..._words.indexed
+              .map<Widget>((word) => WordView(
+                    word: word.$2,
+                    onLetterTap: (letterIndex) =>
+                        _onWordLetterTap(word.$1, letterIndex),
+                    horizontalPadding: widget.horizontalPadding,
+                  ))
+              .separate((i, e0, e1) => SizedBox(height: 8)),
         ],
       ],
     );

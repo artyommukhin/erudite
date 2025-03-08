@@ -19,11 +19,22 @@ class Game extends ChangeNotifier {
 
   int get roundNumber => (moveNumber / players.length).ceil();
 
-  void move(Word word, bool usedAllLetters) {
-    if (isWordAlreadyInGame(word)) {
-      throw Exception('Такое слово уже есть');
+  void move(List<Word> words, bool usedAllLetters) {
+    for (int i = 0; i < words.length; i++) {
+      for (int j = i + 1; j < words.length; j++) {
+        if (words[i].hasEqualLetters(words[j])) {
+          throw Exception('Слова не могут повторяться');
+        }
+      }
     }
-    final move = Move(word: word, usedAllLetters: usedAllLetters);
+
+    for (final word in words) {
+      if (isWordAlreadyInGame(word)) {
+        throw Exception('Слово "$word" уже есть');
+      }
+    }
+
+    final move = Move(words: words, usedAllLetters: usedAllLetters);
     currentPlayer.addMove(move);
     moves.add(move);
     if (isWinScoreReached()) {
@@ -45,8 +56,8 @@ class Game extends ChangeNotifier {
 
   bool isWordAlreadyInGame(Word word) {
     return moves
-        .map((m) => m.word)
-        .nonNulls
+        .map((m) => m.words)
+        .expand((w) => w)
         .any((w) => w.hasEqualLetters(word));
   }
 

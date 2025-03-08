@@ -11,7 +11,7 @@ class WordCalculator extends StatefulWidget {
   });
 
   final double horizontalPadding;
-  final ValueSetter<(Word?, bool)>? onUpdate;
+  final ValueSetter<(List<Word>, bool)>? onUpdate;
   final TextEditingController? controller;
 
   @override
@@ -30,9 +30,9 @@ class _WordCalculatorState extends State<WordCalculator> {
           horizontalPadding: widget.horizontalPadding,
           onUpdate: (result) {
             widget.onUpdate?.call(result);
-            final (word, allLettersUsed) = result;
+            final (words, allLettersUsed) = result;
             setState(() {
-              _score = word?.computeScore() ?? 0;
+              _score = words.fold<int>(0, (prev, w) => prev + w.computeScore());
               if (allLettersUsed) _score += 15;
             });
           },
