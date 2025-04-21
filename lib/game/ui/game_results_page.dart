@@ -25,6 +25,20 @@ class GameResultsPage extends StatelessWidget {
     return longestWords;
   }
 
+  Iterable<Word> get bestScoringWords {
+    final biggestWordScore = game.moves
+        .expand((m) => m.words)
+        .map((w) => w.computeScore())
+        .toSet()
+        .fold(0, (max, score) => score > max ? score : max);
+
+    final bestScoringWords = game.moves
+        .expand((m) => m.words)
+        .where((element) => element.computeScore() == biggestWordScore);
+
+    return bestScoringWords;
+  }
+
   @override
   Widget build(BuildContext context) {
     final sortedPlayers = game.players.toList()
@@ -50,6 +64,15 @@ class GameResultsPage extends StatelessWidget {
                   : 'Самые длинные слова:',
             ),
             for (final word in longestWords) Text(word.toString()),
+            SizedBox(height: 16),
+          ],
+          if (bestScoringWords.isNotEmpty) ...[
+            Text(
+              bestScoringWords.length == 1
+                  ? 'Самое дорогое слово:'
+                  : 'Самые дорогие слова:',
+            ),
+            for (final word in bestScoringWords) Text(word.toString()),
             SizedBox(height: 16),
           ],
           PlayerTable(game: game),
