@@ -1,5 +1,6 @@
 import 'package:erudite_app/game/ui/models/game.dart';
 import 'package:erudite_app/game/ui/widgets/player_table.dart';
+import 'package:erudite_app/word_calculator/domain/models/word.dart';
 import 'package:flutter/material.dart';
 
 class GameResultsPage extends StatelessWidget {
@@ -9,6 +10,20 @@ class GameResultsPage extends StatelessWidget {
   });
 
   final Game game;
+
+  Iterable<Word> get longestWords {
+    final biggestWordLength = game.moves
+        .expand((m) => m.words)
+        .map((w) => w.letters.length)
+        .toSet()
+        .fold(0, (max, len) => len > max ? len : max);
+
+    final longestWords = game.moves
+        .expand((m) => m.words)
+        .where((element) => element.letters.length == biggestWordLength);
+
+    return longestWords;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +42,16 @@ class GameResultsPage extends StatelessWidget {
           Center(child: Text('Победитель: $winner')),
           Text('Другие игроки:'),
           for (final p in sortedPlayers) Text('${p.name}: ${p.score}'),
+          SizedBox(height: 16),
+          if (longestWords.isNotEmpty) ...[
+            Text(
+              longestWords.length == 1
+                  ? 'Самое длинное слово:'
+                  : 'Самые длинные слова:',
+            ),
+            for (final word in longestWords) Text(word.toString()),
+            SizedBox(height: 16),
+          ],
           PlayerTable(game: game),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(),
