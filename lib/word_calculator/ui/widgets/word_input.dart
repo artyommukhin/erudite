@@ -1,6 +1,5 @@
 import 'package:erudite_app/word_calculator/domain/models/word.dart';
 import 'package:erudite_app/word_calculator/domain/models/letter.dart';
-import 'package:erudite_app/word_calculator/domain/letter_scores.dart';
 import 'package:erudite_app/word_calculator/domain/models/multiplier.dart';
 import 'package:erudite_app/word_calculator/ui/widgets/word_view.dart';
 import 'package:flutter/material.dart';
@@ -56,29 +55,11 @@ class _WordInputState extends State<WordInput> {
         .trim()
         .split(' ')
         .where((element) => element.isNotEmpty)
-        .map((e) {
-      final letters = _mapInputToLetters(e);
-      return Word(letters);
-    }).toList();
+        .map((e) => Word.fromString(e))
+        .toList();
 
     setState(() => _words = words);
     widget.onUpdate((words, allLettersUsed));
-  }
-
-  List<LetterDto> _mapInputToLetters(String input) {
-    final letters = input.characters.map((e) {
-      final score = letterScores[e.toLowerCase()];
-      if (score == null) {
-        throw Exception('Unknown letter: $e');
-      }
-
-      return LetterDto(
-        value: LetterValue(symbol: e, score: score),
-        multiplier: Multiplier.none,
-      );
-    }).toList();
-
-    return letters;
   }
 
   void _onWordLetterTap(int wordIndex, int letterIndex) {

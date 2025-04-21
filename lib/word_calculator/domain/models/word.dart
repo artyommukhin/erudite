@@ -1,9 +1,21 @@
+import 'package:erudite_app/word_calculator/domain/letter_scores.dart';
 import 'package:erudite_app/word_calculator/domain/models/multiplier.dart';
 
 import 'letter.dart';
 
 class Word {
   Word(this.letters);
+
+  Word.fromString(String input)
+      : letters = input.split('').map((e) {
+          final score = letterScores[e.toLowerCase()];
+          if (score == null) throw Exception('Unknown letter: $e');
+
+          return LetterDto(
+            value: LetterValue(symbol: e, score: score),
+            multiplier: Multiplier.none,
+          );
+        }).toList();
 
   final List<LetterDto> letters;
 
