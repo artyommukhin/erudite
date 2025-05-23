@@ -54,8 +54,14 @@ class GameResultsPage extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         children: [
           Center(child: Text('Победитель: $winner')),
+          Center(child: Text('Счёт: ${winner.score}')),
+          Center(
+            child: Text('Эффективность: ${winner.effectiveness} очков/слово'),
+          ),
+          SizedBox(height: 16),
           Text('Другие игроки:'),
-          for (final p in sortedPlayers) Text('${p.name}: ${p.score}'),
+          for (final p in sortedPlayers)
+            Text('${p.name}: ${p.score} (${p.effectiveness} очков/слово)'),
           SizedBox(height: 16),
           if (longestWords.isNotEmpty) ...[
             Text(

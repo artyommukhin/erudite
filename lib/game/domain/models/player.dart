@@ -11,6 +11,14 @@ class Player {
 
   List<Move> get moves => _moves;
 
+  double get effectiveness {
+    final letterCount = moves
+        .expand((m) => m.words)
+        .fold(0, (count, word) => count + word.letters.length);
+
+    return score / letterCount;
+  }
+
   void addMove(Move move) {
     _moves.add(move);
     for (final word in move.words) {
