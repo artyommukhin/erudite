@@ -44,8 +44,10 @@ class _GamePageState extends State<GamePage> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) =>
-          Game(winScore: widget.winScore)..players.addAll(widget.players),
+      create: (context) => Game(
+        players: widget.players,
+        winScore: widget.winScore,
+      ),
       child: Consumer<Game>(
         builder: (context, game, child) {
           return PopScope(

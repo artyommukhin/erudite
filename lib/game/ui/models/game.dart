@@ -4,9 +4,12 @@ import 'package:erudite_app/word_calculator/domain/models/word.dart';
 import 'package:flutter/foundation.dart';
 
 class Game extends ChangeNotifier {
-  Game({this.winScore});
+  Game({
+    required List<Player> players,
+    this.winScore,
+  }) : players = List.unmodifiable(players);
 
-  final List<Player> players = [];
+  final List<Player> players;
   final int? winScore;
   int _currentPlayerIndex = 0;
   int moveNumber = 1;
