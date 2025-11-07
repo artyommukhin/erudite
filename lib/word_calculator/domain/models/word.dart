@@ -1,5 +1,6 @@
 import 'package:erudite_app/word_calculator/domain/letter_scores.dart';
 import 'package:erudite_app/word_calculator/domain/models/multiplier.dart';
+import 'package:flutter/foundation.dart';
 
 import 'letter.dart';
 
@@ -50,4 +51,14 @@ class Word {
   bool hasEqualLetters(Word other) {
     return toString() == other.toString();
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is Word &&
+        other.runtimeType == runtimeType &&
+        listEquals(other.letters, letters);
+  }
+
+  @override
+  int get hashCode => Object.hashAll(letters);
 }
