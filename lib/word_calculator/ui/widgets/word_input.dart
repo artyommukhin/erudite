@@ -1,6 +1,5 @@
 import 'package:erudite_app/word_calculator/domain/models/word.dart';
 import 'package:erudite_app/word_calculator/domain/models/letter.dart';
-import 'package:erudite_app/word_calculator/domain/models/multiplier.dart';
 import 'package:erudite_app/word_calculator/ui/widgets/word_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -66,9 +65,8 @@ class _WordInputState extends State<WordInput> {
     setState(() {
       final currentWord = _words[wordIndex];
       final currentLetter = currentWord.letters[letterIndex];
+      final newMultiplier = currentLetter.multiplier.next;
 
-      final newMultiplier = Multiplier.values[
-          (currentLetter.multiplier.index + 1) % Multiplier.values.length];
       currentWord.letters[letterIndex] = LetterDto(
         value: currentLetter.value,
         multiplier: newMultiplier,

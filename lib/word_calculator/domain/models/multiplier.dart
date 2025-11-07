@@ -7,6 +7,8 @@ enum Multiplier {
   wordX2,
   wordX3;
 
+  Multiplier get next => values[(index + 1) % values.length];
+
   bool get isForLetter =>
       this == Multiplier.letterX2 || this == Multiplier.letterX3;
 
