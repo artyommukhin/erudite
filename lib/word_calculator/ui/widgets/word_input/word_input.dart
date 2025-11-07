@@ -1,5 +1,5 @@
-import 'package:erudite_app/word_calculator/domain/models/word.dart';
 import 'package:erudite_app/word_calculator/domain/models/letter.dart';
+import 'package:erudite_app/word_calculator/ui/widgets/word_input/word_input_controller.dart';
 import 'package:erudite_app/word_calculator/ui/widgets/word_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,62 +8,47 @@ import 'package:separate/separate.dart';
 class WordInput extends StatefulWidget {
   const WordInput({
     super.key,
-    this.controller,
-    required this.onUpdate,
     required this.horizontalPadding,
+    this.wordsController,
   });
 
-  final TextEditingController? controller;
-  final ValueChanged<(List<Word>, bool)> onUpdate;
-
   final double horizontalPadding;
+  final WordInputController? wordsController;
 
   @override
   State<WordInput> createState() => _WordInputState();
 }
 
 class _WordInputState extends State<WordInput> {
-  late TextEditingController _controller;
+  final _controller = TextEditingController();
+  late WordInputController _wordsController;
+
   String? _text;
-  List<Word> _words = [];
-  bool allLettersUsed = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = widget.controller ?? TextEditingController();
+    _wordsController = widget.wordsController ?? WordInputController();
 
     _controller.addListener(() {
       final input = _controller.text;
       if (input != _text) {
         _text = input;
-        _onInputUpdate(input);
+        _wordsController.text = input;
+      }
+    });
+
+    _wordsController.addListener(() {
+      if (_wordsController.words.isEmpty) {
+        _controller.clear();
       }
     });
   }
 
-  void _onInputUpdate(String input) {
-    final filteredInput = input.trim();
-    if (filteredInput.isEmpty) {
-      setState(() => _words = []);
-      widget.onUpdate((_words, allLettersUsed));
-      return;
-    }
-
-    final words = filteredInput
-        .trim()
-        .split(' ')
-        .where((element) => element.isNotEmpty)
-        .map((e) => Word.fromString(e))
-        .toList();
-
-    setState(() => _words = words);
-    widget.onUpdate((words, allLettersUsed));
-  }
-
   void _onWordLetterTap(int wordIndex, int letterIndex) {
     setState(() {
-      final currentWord = _words[wordIndex];
+      final words = _wordsController.words;
+      final currentWord = words[wordIndex];
       final currentLetter = currentWord.letters[letterIndex];
       final newMultiplier = currentLetter.multiplier.next;
 
@@ -71,8 +56,9 @@ class _WordInputState extends State<WordInput> {
         value: currentLetter.value,
         multiplier: newMultiplier,
       );
-      _words[wordIndex] = currentWord;
-      widget.onUpdate((_words, allLettersUsed));
+
+      words[wordIndex] = currentWord;
+      _wordsController.updateWords(words);
     });
   }
 
@@ -96,19 +82,18 @@ class _WordInputState extends State<WordInput> {
             ),
           ),
         ),
-        if (_words.isNotEmpty) ...[
+        if (_wordsController.words.isNotEmpty) ...[
           SizedBox(height: 8),
           CheckboxListTile(
             controlAffinity: ListTileControlAffinity.leading,
-            value: allLettersUsed,
+            value: _wordsController.allLettersUsed,
             onChanged: (value) {
-              setState(() => allLettersUsed = value ?? false);
-              widget.onUpdate((_words, allLettersUsed));
+              _wordsController.updateAllLettersUsed(value ?? false);
             },
             title: Text('Использованы все буквы с руки'),
           ),
           SizedBox(height: 8),
-          ..._words.indexed
+          ..._wordsController.words.indexed
               .map<Widget>((word) => WordView(
                     word: word.$2,
                     onLetterTap: (letterIndex) =>

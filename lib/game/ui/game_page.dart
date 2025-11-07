@@ -2,9 +2,9 @@ import 'package:erudite_app/game/ui/game_results_page.dart';
 import 'package:erudite_app/game/ui/leave_confirmation_dialog.dart';
 import 'package:erudite_app/game/ui/models/game.dart';
 import 'package:erudite_app/game/domain/models/player.dart';
-import 'package:erudite_app/word_calculator/domain/models/word.dart';
 import 'package:erudite_app/game/ui/widgets/player_table.dart';
 import 'package:erudite_app/word_calculator/ui/widgets/word_calculator.dart';
+import 'package:erudite_app/word_calculator/ui/widgets/word_input/word_input_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -23,14 +23,11 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
-  final inputController = TextEditingController();
-
-  List<Word> words = [];
-  bool allLettersUsed = false;
+  final _wordsController = WordInputController();
 
   void _submitWord(Game game) {
     try {
-      game.move(words, allLettersUsed);
+      game.move(_wordsController.words, _wordsController.allLettersUsed);
     } catch (e) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -38,7 +35,7 @@ class _GamePageState extends State<GamePage> {
       return;
     }
 
-    setState(() => inputController.clear());
+    setState(() => _wordsController.clear());
   }
 
   @override
@@ -80,14 +77,8 @@ class _GamePageState extends State<GamePage> {
                   ),
                   SizedBox(height: 16),
                   WordCalculator(
-                    controller: inputController,
-                    onUpdate: (value) {
-                      setState(() {
-                        final (words, allLettersUsed) = value;
-                        this.words = words;
-                        this.allLettersUsed = allLettersUsed;
-                      });
-                    },
+                    wordsController: _wordsController,
+                    onUpdate: (value) => setState(() {}),
                   ),
                   SizedBox(height: 16),
                   Padding(
@@ -97,7 +88,7 @@ class _GamePageState extends State<GamePage> {
                         Row(
                           children: [
                             FilledButton(
-                              onPressed: words.isEmpty
+                              onPressed: _wordsController.words.isEmpty
                                   ? null
                                   : () => _submitWord(game),
                               child: Text('Ввести слово'),
@@ -110,7 +101,7 @@ class _GamePageState extends State<GamePage> {
                             FilledButton(
                               onPressed: () {
                                 game.skipMove();
-                                setState(() => inputController.clear());
+                                setState(() => _wordsController.clear());
                               },
                               child: Text('Пропустить ход'),
                             ),
