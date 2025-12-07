@@ -56,12 +56,14 @@ class GameResultsPage extends StatelessWidget {
           Center(child: Text('Победитель: $winner')),
           Center(child: Text('Счёт: ${winner.score}')),
           Center(
-            child: Text('Эффективность: ${winner.effectiveness} очков/слово'),
+            child: Text(
+                'Эффективность: ${winner.effectiveness.toStringAsFixed(2)} очков за букву'),
           ),
           SizedBox(height: 16),
           Text('Другие игроки:'),
-          for (final p in sortedPlayers)
-            Text('${p.name}: ${p.score} (${p.effectiveness} очков/слово)'),
+          for (final p in sortedPlayers.sublist(1))
+            Text(
+                '${p.name}: ${p.score} (${p.effectiveness.toStringAsFixed(2)} очков на букву)'),
           SizedBox(height: 16),
           if (longestWords.isNotEmpty) ...[
             Text(
@@ -69,7 +71,8 @@ class GameResultsPage extends StatelessWidget {
                   ? 'Самое длинное слово:'
                   : 'Самые длинные слова:',
             ),
-            for (final word in longestWords) Text(word.toString()),
+            for (final word in longestWords)
+              Text('$word - ${word.letters.length} букв'),
             SizedBox(height: 16),
           ],
           if (bestScoringWords.isNotEmpty) ...[
@@ -78,13 +81,17 @@ class GameResultsPage extends StatelessWidget {
                   ? 'Самое дорогое слово:'
                   : 'Самые дорогие слова:',
             ),
-            for (final word in bestScoringWords) Text(word.toString()),
+            for (final word in bestScoringWords)
+              Text('$word - ${word.computeScore()} очков'),
             SizedBox(height: 16),
           ],
           PlayerTable(game: game),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Ок'),
+          SizedBox(height: 16),
+          Center(
+            child: FilledButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Ок'),
+            ),
           ),
         ],
       ),
