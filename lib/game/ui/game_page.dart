@@ -35,7 +35,7 @@ class _GamePageState extends State<GamePage> {
       return;
     }
 
-    setState(() => _wordsController.clear());
+    _wordsController.clear();
   }
 
   @override
@@ -78,7 +78,6 @@ class _GamePageState extends State<GamePage> {
                   SizedBox(height: 16),
                   WordCalculator(
                     wordsController: _wordsController,
-                    onUpdate: (value) => setState(() {}),
                   ),
                   SizedBox(height: 16),
                   Padding(
@@ -87,11 +86,16 @@ class _GamePageState extends State<GamePage> {
                       children: [
                         Row(
                           children: [
-                            FilledButton(
-                              onPressed: _wordsController.words.isEmpty
-                                  ? null
-                                  : () => _submitWord(game),
-                              child: Text('Ввести слово'),
+                            ValueListenableBuilder(
+                              valueListenable: _wordsController,
+                              builder: (context, value, child) {
+                                return FilledButton(
+                                  onPressed: value.words.isEmpty
+                                      ? null
+                                      : () => _submitWord(game),
+                                  child: Text('Ввести слово'),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -101,7 +105,7 @@ class _GamePageState extends State<GamePage> {
                             FilledButton(
                               onPressed: () {
                                 game.skipMove();
-                                setState(() => _wordsController.clear());
+                                _wordsController.clear();
                               },
                               child: Text('Пропустить ход'),
                             ),
@@ -113,9 +117,7 @@ class _GamePageState extends State<GamePage> {
                             FilledButton(
                               onPressed: game.moveNumber == 1
                                   ? null
-                                  : () => setState(() {
-                                        game.revertMove();
-                                      }),
+                                  : () => game.revertMove(),
                               child: Text('Отменить ход'),
                             ),
                           ],
