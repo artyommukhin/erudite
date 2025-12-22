@@ -1,8 +1,10 @@
+import 'package:erudite_app/can_exit_controller.dart';
 import 'package:erudite_app/game/ui/game_results_page.dart';
 import 'package:erudite_app/game/ui/leave_confirmation_dialog.dart';
 import 'package:erudite_app/game/ui/models/game.dart';
 import 'package:erudite_app/game/domain/models/player.dart';
 import 'package:erudite_app/game/ui/widgets/player_table.dart';
+import 'package:erudite_app/game_route_observer.dart';
 import 'package:erudite_app/word_calculator/ui/widgets/word_calculator.dart';
 import 'package:erudite_app/word_calculator/ui/widgets/word_input/word_input_controller.dart';
 import 'package:flutter/material.dart';
@@ -22,8 +24,9 @@ class GamePage extends StatefulWidget {
   State<GamePage> createState() => _GamePageState();
 }
 
-class _GamePageState extends State<GamePage> {
+class _GamePageState extends State<GamePage> with RouteAware {
   final _wordsController = WordInputController();
+  late GameRouteObserver _routeObserver;
 
   void _submitWord(Game game) {
     try {
@@ -36,6 +39,24 @@ class _GamePageState extends State<GamePage> {
     }
 
     _wordsController.clear();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _routeObserver = context.watch<GameRouteObserver>()
+      ..subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    _routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPush() {
+    context.read<CanExitController>().forbid();
   }
 
   @override
@@ -135,6 +156,7 @@ class _GamePageState extends State<GamePage> {
                                         builder: (context) =>
                                             GameResultsPage(game: game),
                                       ));
+                                      context.read<CanExitController>().allow();
                                     },
                               child: Text('Завершить игру'),
                             ),
