@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import 'widgets/player_list_item.dart';
+
 class CreateGamePage extends StatefulWidget {
   const CreateGamePage({super.key});
 
@@ -26,6 +28,14 @@ class _CreateGamePageState extends State<CreateGamePage> {
     } else {
       canExit.allow();
     }
+  }
+
+  void _addPlayer(String name) {
+    setState(() {
+      players.add(Player(name: name));
+      playerNameController.clear();
+      _updateCanExit();
+    });
   }
 
   @override
@@ -52,6 +62,7 @@ class _CreateGamePageState extends State<CreateGamePage> {
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
               ],
+              textInputAction: TextInputAction.next,
               onChanged: (value) => setState(() {
                 winScore = int.tryParse(value);
                 _updateCanExit();
@@ -61,24 +72,27 @@ class _CreateGamePageState extends State<CreateGamePage> {
             TextField(
               controller: playerNameController,
               decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Добавить игрока',
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                  suffixIcon: playerName == null || playerName == ''
-                      ? null
-                      : IconButton(
-                          onPressed: () {
-                            setState(() {
-                              players.add(Player(name: playerName!));
-                              playerNameController.clear();
-                              _updateCanExit();
-                            });
-                          },
-                          icon: Icon(Icons.add))),
+                border: OutlineInputBorder(),
+                labelText: 'Добавить игрока',
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                suffixIcon: playerName == null || playerName == ''
+                    ? null
+                    : Padding(
+                        padding: const EdgeInsets.only(right: 4),
+                        child: IconButton(
+                          onPressed: () => _addPlayer(playerName!),
+                          icon: Icon(Icons.add),
+                        ),
+                      ),
+              ),
+              textInputAction: TextInputAction.none,
               onChanged: (value) {
                 setState(() {
                   playerName = value;
                 });
+              },
+              onSubmitted: (value) {
+                _addPlayer(value);
               },
             ),
             SizedBox(height: 16),
@@ -88,19 +102,21 @@ class _CreateGamePageState extends State<CreateGamePage> {
                 header: Text('Добавленные игроки:'),
                 onReorder: (oldIndex, newIndex) {
                   setState(() {
+                    if (oldIndex < newIndex) newIndex--;
                     final player = players.removeAt(oldIndex);
                     players.insert(newIndex, player);
                   });
                 },
                 children: players.indexed.map<Widget>((e) {
                   final (index, player) = e;
-                  return ListTile(
+                  return PlayerListItem(
                     key: ValueKey(player),
-                    title: Text(player.name),
-                    trailing: ReorderableDragStartListener(
-                      index: index,
-                      child: const Icon(Icons.drag_handle),
-                    ),
+                    index: index,
+                    name: player.name,
+                    onRemove: () => setState(() {
+                      players.removeAt(index);
+                      _updateCanExit();
+                    }),
                   );
                 }).toList(),
               ),

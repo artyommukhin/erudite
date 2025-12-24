@@ -1,4 +1,4 @@
-import 'package:erudite_app/game/ui/create_game_page.dart';
+import 'package:erudite_app/game/ui/create_game_page/create_game_page.dart';
 import 'package:erudite_app/word_calculator/ui/calculator_page.dart';
 import 'package:flutter/material.dart';
 
