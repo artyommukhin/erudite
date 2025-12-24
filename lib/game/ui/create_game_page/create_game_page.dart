@@ -19,7 +19,6 @@ class _CreateGamePageState extends State<CreateGamePage> {
   int? winScore;
 
   final playerNameController = TextEditingController();
-  String? playerName;
 
   void _updateCanExit() {
     final canExit = context.read<CanExitController>();
@@ -69,37 +68,36 @@ class _CreateGamePageState extends State<CreateGamePage> {
               }),
             ),
             SizedBox(height: 16),
-            TextField(
-              controller: playerNameController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Добавить игрока',
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                suffixIcon: playerName == null || playerName == ''
-                    ? null
-                    : Padding(
-                        padding: const EdgeInsets.only(right: 4),
-                        child: IconButton(
-                          onPressed: () => _addPlayer(playerName!),
-                          icon: Icon(Icons.add),
-                        ),
-                      ),
-              ),
-              textInputAction: TextInputAction.none,
-              onChanged: (value) {
-                setState(() {
-                  playerName = value;
-                });
-              },
-              onSubmitted: (value) {
-                _addPlayer(value);
+            ValueListenableBuilder(
+              valueListenable: playerNameController,
+              builder: (context, playerNameValue, child) {
+                final playerName = playerNameValue.text;
+                return TextField(
+                  controller: playerNameController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Добавить игрока',
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    suffix: IconButton(
+                      onPressed: playerName == ''
+                          ? null
+                          : () => _addPlayer(playerName),
+                      icon: Icon(Icons.add),
+                    ),
+                  ),
+                  textInputAction: TextInputAction.none,
+                  onSubmitted: _addPlayer,
+                );
               },
             ),
             SizedBox(height: 16),
             if (players.isNotEmpty) ...[
               ReorderableListView(
                 shrinkWrap: true,
-                header: Text('Добавленные игроки:'),
+                header: Text(
+                  'Добавленные игроки\nВыберите первого игрока на этом экране, пока можно поменять порядок',
+                  textAlign: TextAlign.center,
+                ),
                 onReorder: (oldIndex, newIndex) {
                   setState(() {
                     if (oldIndex < newIndex) newIndex--;
@@ -122,18 +120,20 @@ class _CreateGamePageState extends State<CreateGamePage> {
               ),
               SizedBox(height: 16),
             ],
-            FilledButton(
-              onPressed: !canStartGame
-                  ? null
-                  : () {
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => GamePage(
-                          winScore: winScore,
-                          players: players,
-                        ),
-                      ));
-                    },
-              child: Text('Начать игру'),
+            Center(
+              child: FilledButton(
+                onPressed: !canStartGame
+                    ? null
+                    : () {
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => GamePage(
+                            winScore: winScore,
+                            players: players,
+                          ),
+                        ));
+                      },
+                child: Text('Начать игру'),
+              ),
             ),
           ],
         ),
