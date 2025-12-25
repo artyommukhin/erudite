@@ -1,11 +1,12 @@
 import 'package:erudite_app/can_exit_controller.dart';
+import 'package:erudite_app/game/ui/finish_confirmation_dialog.dart';
 import 'package:erudite_app/game/ui/game_results_page.dart';
 import 'package:erudite_app/game/ui/leave_confirmation_dialog.dart';
 import 'package:erudite_app/game/ui/models/game.dart';
 import 'package:erudite_app/game/domain/models/player.dart';
 import 'package:erudite_app/game/ui/widgets/player_table.dart';
 import 'package:erudite_app/game_route_observer.dart';
-import 'package:erudite_app/word_calculator/ui/widgets/word_calculator.dart';
+import 'package:erudite_app/word_calculator/ui/widgets/word_input/word_input.dart';
 import 'package:erudite_app/word_calculator/ui/widgets/word_input/word_input_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -28,9 +29,9 @@ class _GamePageState extends State<GamePage> with RouteAware {
   final _wordsController = WordInputController();
   late GameRouteObserver _routeObserver;
 
-  void _submitWord(Game game) {
+  void _submitWord(WordInputValue value, Game game) {
     try {
-      game.move(_wordsController.words, _wordsController.allLettersUsed);
+      game.move(value.words, value.allLettersUsed);
     } catch (e) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -39,6 +40,13 @@ class _GamePageState extends State<GamePage> with RouteAware {
     }
 
     _wordsController.clear();
+  }
+
+  void _navigateToResults(Game game) {
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+      builder: (context) => GameResultsPage(game: game),
+    ));
+    context.read<CanExitController>().allow();
   }
 
   @override
@@ -62,10 +70,16 @@ class _GamePageState extends State<GamePage> with RouteAware {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => Game(
-        players: widget.players,
-        winScore: widget.winScore,
-      ),
+      create: (context) {
+        final game = Game(
+          players: widget.players,
+          winScore: widget.winScore,
+        );
+        game.addListener(() {
+          if (game.isFinished) _navigateToResults(game);
+        });
+        return game;
+      },
       child: Consumer<Game>(
         builder: (context, game, child) {
           return PopScope(
@@ -81,91 +95,63 @@ class _GamePageState extends State<GamePage> with RouteAware {
               appBar: AppBar(
                 backgroundColor: Theme.of(context).colorScheme.inversePrimary,
                 title: Text('Ходит ${game.currentPlayer.name}'),
-              ),
-              body: ListView(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                children: [
-                  if (game.winScore != null) ...[
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text('Очков для победы: ${game.winScore}'),
-                    ),
-                    SizedBox(height: 16),
-                  ],
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: PlayerTable(game: game),
+                actionsPadding: EdgeInsets.only(right: 8),
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      game.skipMove();
+                      _wordsController.clear();
+                    },
+                    icon: Icon(Icons.skip_next),
+                    tooltip: 'Пропустить ход',
                   ),
-                  SizedBox(height: 16),
-                  WordCalculator(
-                    wordsController: _wordsController,
+                  IconButton(
+                    onPressed:
+                        game.moveNumber == 1 ? null : () => game.revertMove(),
+                    icon: Icon(Icons.backspace),
+                    tooltip: 'Отменить ход',
                   ),
-                  SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            ValueListenableBuilder(
-                              valueListenable: _wordsController,
-                              builder: (context, value, child) {
-                                return FilledButton(
-                                  onPressed: value.words.isEmpty
-                                      ? null
-                                      : () => _submitWord(game),
-                                  child: Text('Ввести слово'),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        Row(
-                          children: [
-                            FilledButton(
-                              onPressed: () {
-                                game.skipMove();
-                                _wordsController.clear();
-                              },
-                              child: Text('Пропустить ход'),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        Row(
-                          children: [
-                            FilledButton(
-                              onPressed: game.moveNumber == 1
-                                  ? null
-                                  : () => game.revertMove(),
-                              child: Text('Отменить ход'),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        Row(
-                          children: [
-                            FilledButton(
-                              onPressed: game.isFinished
-                                  ? null
-                                  : () {
-                                      game.finish();
-                                      Navigator.of(context)
-                                          .pushReplacement(MaterialPageRoute(
-                                        builder: (context) =>
-                                            GameResultsPage(game: game),
-                                      ));
-                                      context.read<CanExitController>().allow();
-                                    },
-                              child: Text('Завершить игру'),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                  IconButton(
+                    onPressed: () async {
+                      final shouldFinish =
+                          await showFinishConfirmationDialog(context);
+                      if (shouldFinish == true && context.mounted) {
+                        game.finish();
+                        _navigateToResults(game);
+                      }
+                    },
+                    icon: Icon(Icons.exit_to_app),
+                    tooltip: 'Завершить игру',
                   ),
                 ],
+              ),
+              body: Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Column(
+                  children: [
+                    if (game.winScore != null) ...[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text('Очков для победы: ${game.winScore}'),
+                      ),
+                      SizedBox(height: 16),
+                    ],
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          bottom: 16,
+                        ),
+                        child: PlayerTable(game: game),
+                      ),
+                    ),
+                    WordInput(
+                      wordsController: _wordsController,
+                      onSubmit: (value) => _submitWord(value, game),
+                    ),
+                  ],
+                ),
               ),
             ),
           );

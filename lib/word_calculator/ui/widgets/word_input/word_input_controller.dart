@@ -57,6 +57,14 @@ class WordInputController extends ValueNotifier<WordInputValue> {
     );
   }
 
+  void updateLetterMultiplier(int wordIndex, int letterIndex) {
+    final currentWord = words[wordIndex];
+    final currentLetter = currentWord.letters[letterIndex];
+    final newMultiplier = currentLetter.multiplier.next;
+    currentWord.updateMultiplierAt(letterIndex, newMultiplier);
+    notifyListeners();
+  }
+
   void clear() {
     value = const WordInputValue();
   }

@@ -1,4 +1,4 @@
-import 'package:erudite_app/word_calculator/ui/widgets/word_calculator.dart';
+import 'package:erudite_app/word_calculator/ui/widgets/word_input/word_input.dart';
 import 'package:flutter/material.dart';
 
 class CalculatorPage extends StatelessWidget {
@@ -10,11 +10,14 @@ class CalculatorPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Калькулятор слов'),
       ),
-      body: ListView(
+      body: Padding(
         padding: EdgeInsets.symmetric(vertical: 24),
-        children: [
-          WordCalculator(),
-        ],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            WordInput(),
+          ],
+        ),
       ),
     );
   }
